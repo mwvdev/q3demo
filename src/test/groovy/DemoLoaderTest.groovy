@@ -2,6 +2,7 @@
 
 import mwvdev.quake.constants.PlayerMoveType
 import mwvdev.quake.constants.WeaponType
+import mwvdev.quake.exceptions.LoaderException
 import mwvdev.quake.loaders.DemoLoader
 import mwvdev.quake.models.Demo
 import mwvdev.quake.models.Message
@@ -14,7 +15,7 @@ class DemoLoaderTest extends Specification {
 
     DemoLoader demoLoader = new DemoLoader()
 
-    def "DemoLoader should load demo"() {
+    def "should load demo"() {
         InputStream inputStream = Class.getResourceAsStream( "/evil-v-Spart1e-sinister-21618.dm_73" )
         Channel channel = Channels.newChannel( inputStream )
 
@@ -71,6 +72,17 @@ class DemoLoaderTest extends Specification {
         message2.snapshot.playerState.stats == [115, null, null, 510, null, null, 65, 100, null, null, null, null, null, null, null, null]
         message2.snapshot.playerState.persistent == [null, null, 16384, null, 1, null, null, null, null, null, null, null, null, null, null, null]
         message2.snapshot.playerState.ammo == [null, 65535, 150, 25, 25, 25, 150, 25, 150, null, 65535, null, null, null, null, null]
+    }
+
+    def "should throw loading exception on truncated demo"() {
+        InputStream inputStream = Class.getResourceAsStream( "/evil-v-Spart1e-sinister-21618-truncated.dm_73" )
+        Channel channel = Channels.newChannel( inputStream )
+
+        when:
+        demoLoader.loadDemo( channel )
+
+        then:
+        thrown( LoaderException.class )
     }
 
 }
