@@ -17,7 +17,16 @@ class HuffmanReaderTest extends Specification {
         huffmanReader.readByte() == 100
     }
 
-    def "readBit should work"() {
+    def "should read signed bytes"() {
+        Byte[] bytes = [ BitUtils.combineBits( [ 1, 1, 1, 0, 1, 0, 1, 1 ] as Integer[] ),
+                         BitUtils.combineBits( [ 1, 0, 0, 0, 0, 0, 0, 0 ] as Integer[] ) ]
+        HuffmanReader huffmanReader = createHuffmanReader( bytes )
+
+        expect:
+        huffmanReader.readSignedByte() == -16
+    }
+
+    def "should read bits"() {
         Integer[] inputBits = [ 1, 1, 1, 0, 1, 0, 0, 1 ]
         HuffmanReader huffmanReader = createHuffmanReader( [ BitUtils.combineBits( inputBits ) ] as Byte[] )
 
@@ -40,6 +49,24 @@ class HuffmanReaderTest extends Specification {
         expect:
         huffmanReader.readShort() == 0
         huffmanReader.readShort() == 668
+    }
+
+    def "should read signed short integers"() {
+        Byte[] bytes = [ BitUtils.combineBits( [ 1, 0, 1, 1, 0, 0, 0, 1 ] as Integer[] ),
+                         BitUtils.combineBits( [ 0, 1, 0, 0, 1, 0, 0, 1 ] as Integer[] ) ]
+        HuffmanReader huffmanReader = createHuffmanReader( bytes )
+
+        expect:
+        huffmanReader.readSignedShort() == -3
+    }
+
+    def "should read integers"() {
+        Byte[] bytes = [ BitUtils.combineBits( [ 0, 0, 1, 0, 0, 0, 1, 0, ] as Integer[] ),
+                         BitUtils.combineBits( [ 1, 0, 1, 0, 1, 0, 1, 0, ] as Integer[] ) ]
+        HuffmanReader huffmanReader = createHuffmanReader( bytes )
+
+        expect:
+        huffmanReader.readInt() == 62
     }
 
     def "should read snapped floats"() {
