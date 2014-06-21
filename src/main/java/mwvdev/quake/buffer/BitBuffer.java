@@ -18,7 +18,7 @@ public class BitBuffer
 
     public int read()
     {
-        if( byteBuffer.limit() * 8 < position )
+        if( byteBuffer.limit() * 8 <= position )
         {
             throw new LoaderException( "Unexpected end of file reached. This could indicate a corrupted demo." );
         }
