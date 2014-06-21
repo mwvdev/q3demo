@@ -1,10 +1,10 @@
 class BitUtils {
 
-    static combineBits( List<Integer> bits ) {
+    static combineBits( Integer[] bits ) {
         int result = 0
 
-        for( i in 0..bits.size - 1 ) {
-            result |= ( ( bits.get( i ) & 1 ) << i )
+        for( bitOffset in 0..bits.length - 1 ) {
+            result |= ( ( bits[bitOffset] & 1 ) << bitOffset )
         }
 
         return result

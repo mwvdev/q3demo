@@ -7,17 +7,13 @@ import java.nio.ByteBuffer
 class BitBufferTest extends Specification {
 
     def "should return bits"() {
-        List<Integer> inputBits = [ 1, 1, 1, 0, 1, 0, 0, 1 ]
-
-        ByteBuffer byteBuffer = ByteBuffer.allocate( 1 )
-        byteBuffer.put( (byte) BitUtils.combineBits( inputBits ) )
-        byteBuffer.flip()
-        BitBuffer bitBuffer = new BitBuffer( byteBuffer )
+        Integer[] inputBits = [ 1, 1, 1, 0, 1, 0, 0, 1 ]
+        BitBuffer bitBuffer = createBitBuffer( [ BitUtils.combineBits( inputBits ) ] as Byte[] )
 
         when:
-        List<Integer> outputBits = []
+        Integer[] outputBits = new Integer[8]
         for( i in 0..7 ) {
-            outputBits.add( bitBuffer.read() )
+            outputBits[i] = bitBuffer.read()
         }
 
         then:
@@ -25,10 +21,7 @@ class BitBufferTest extends Specification {
     }
 
     def "should throw exception when reaching end of buffer"() {
-        ByteBuffer byteBuffer = ByteBuffer.allocate( 1 )
-        byteBuffer.put( (byte) 0 )
-
-        BitBuffer bitBuffer = new BitBuffer( byteBuffer )
+        BitBuffer bitBuffer = createBitBuffer( [ 0 ] as Byte[] )
 
         when:
         for( i in 0..8 ) {
@@ -37,6 +30,18 @@ class BitBufferTest extends Specification {
 
         then:
         thrown( LoaderException )
+    }
+
+    def createBitBuffer( Byte[] bytes ) {
+        ByteBuffer byteBuffer = ByteBuffer.allocate( bytes.length )
+
+        for( i in 0..bytes.length - 1 ) {
+            byteBuffer.put( bytes[i] )
+        }
+
+        byteBuffer.flip()
+
+        return new BitBuffer( byteBuffer )
     }
 
 }
