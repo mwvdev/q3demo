@@ -4,6 +4,7 @@ import mwvdev.quake.constants.PlayerMoveType
 import mwvdev.quake.constants.WeaponType
 import mwvdev.quake.exceptions.LoaderException
 import mwvdev.quake.loaders.DemoLoader
+import mwvdev.quake.models.DeltaEntityState
 import mwvdev.quake.models.Demo
 import mwvdev.quake.models.Message
 import spock.lang.Specification
@@ -33,16 +34,18 @@ class DemoLoaderTest extends Specification {
         message1.gameState.configStrings.get( 659 ) == "SPART^41^7E"
         message1.gameState.configStrings.get( 660 ) == "^48PLAY^7 evil"
         message1.gameState.entityStates.size == 66
-        message1.gameState.entityStates.get( 0 ).number == 72
-        message1.gameState.entityStates.get( 0 ).position.base[0] == 308
-        message1.gameState.entityStates.get( 0 ).position.base[1] == -160
-        message1.gameState.entityStates.get( 0 ).position.base[2] == -7
-        message1.gameState.entityStates.get( 0 ).entityType == 2
-        message1.gameState.entityStates.get( 0 ).groundEntityNum == 1022
-        message1.gameState.entityStates.get( 0 ).getOrigin()[0] == 308
-        message1.gameState.entityStates.get( 0 ).getOrigin()[1] == -160
-        message1.gameState.entityStates.get( 0 ).getOrigin()[2] == -7
-        message1.gameState.entityStates.get( 0 ).getModelIndex() == 8
+        message1.gameState.entityStates.get( 0 ) instanceof DeltaEntityState
+        DeltaEntityState deltaEntityState = message1.gameState.entityStates.get( 0 )
+        deltaEntityState.number == 72
+        deltaEntityState.position.base[0] == 308
+        deltaEntityState.position.base[1] == -160
+        deltaEntityState.position.base[2] == -7
+        deltaEntityState.entityType == 2
+        deltaEntityState.groundEntityNum == 1022
+        deltaEntityState.getOrigin()[0] == 308
+        deltaEntityState.getOrigin()[1] == -160
+        deltaEntityState.getOrigin()[2] == -7
+        deltaEntityState.getModelIndex() == 8
 
         message2.sequence == 81144
         message2.acknowledge == 62

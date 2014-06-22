@@ -1,12 +1,13 @@
 package mwvdev.quake.loaders;
 
+import mwvdev.quake.constants.QuakeConstants;
 import mwvdev.quake.huffman.HuffmanReader;
+import mwvdev.quake.models.DeltaEntityState;
 import mwvdev.quake.models.EntityState;
+import mwvdev.quake.models.RemovedEntityState;
 
-public class EntityStateLoader extends StateLoader
+public class EntityStateLoader
 {
-
-    private static final int GENTITYNUM_BITS = 10;
 
     private EntityFieldReader[] entityFieldReaders = {
         ( ( entityState, huffmanReader ) -> entityState.getPosition().setTime( readInt( huffmanReader ) ) ),
@@ -25,10 +26,10 @@ public class EntityStateLoader extends StateLoader
         ( ( entityState, huffmanReader ) -> entityState.setTorsoAnim( (int) readByte( huffmanReader ) ) ),
         ( ( entityState, huffmanReader ) -> entityState.setEventParm( (int) readByte( huffmanReader ) ) ),
         ( ( entityState, huffmanReader ) -> entityState.setLegsAnim( (int) readByte( huffmanReader ) ) ),
-        ( ( entityState, huffmanReader ) -> entityState.setGroundEntityNum( readBits( huffmanReader, GENTITYNUM_BITS ) ) ),
+        ( ( entityState, huffmanReader ) -> entityState.setGroundEntityNum( readBits( huffmanReader, QuakeConstants.GENTITYNUM_BITS ) ) ),
         ( ( entityState, huffmanReader ) -> entityState.getPosition().setType( (int) readByte( huffmanReader ) ) ),
         ( ( entityState, huffmanReader ) -> entityState.setEntityFlags( readBits( huffmanReader, 19 ) ) ),
-        ( ( entityState, huffmanReader ) -> entityState.setOtherEntityNum( readBits( huffmanReader, GENTITYNUM_BITS ) ) ),
+        ( ( entityState, huffmanReader ) -> entityState.setOtherEntityNum( readBits( huffmanReader, QuakeConstants.GENTITYNUM_BITS ) ) ),
         ( ( entityState, huffmanReader ) -> entityState.setWeapon( (int) readByte( huffmanReader ) ) ),
         ( ( entityState, huffmanReader ) -> entityState.setClientNum( (int) readByte( huffmanReader ) ) ),
         ( ( entityState, huffmanReader ) -> entityState.getAngles()[1] = readFloat( huffmanReader ) ),
@@ -40,7 +41,7 @@ public class EntityStateLoader extends StateLoader
         ( ( entityState, huffmanReader ) -> entityState.setSolid( readBits( huffmanReader, 24 ) ) ),
         ( ( entityState, huffmanReader ) -> entityState.setPowerups( readBits( huffmanReader, 16 ) ) ),
         ( ( entityState, huffmanReader ) -> entityState.setModelIndex( (int) readByte( huffmanReader ) ) ),
-        ( ( entityState, huffmanReader ) -> entityState.setOtherEntityNum2( readBits( huffmanReader, GENTITYNUM_BITS ) ) ),
+        ( ( entityState, huffmanReader ) -> entityState.setOtherEntityNum2( readBits( huffmanReader, QuakeConstants.GENTITYNUM_BITS ) ) ),
         ( ( entityState, huffmanReader ) -> entityState.setLoopSound( (int) readByte( huffmanReader ) ) ),
         ( ( entityState, huffmanReader ) -> entityState.setGeneric1( (int) readByte( huffmanReader ) ) ),
         ( ( entityState, huffmanReader ) -> entityState.getOrigin2()[2] = readFloat( huffmanReader ) ),
@@ -66,18 +67,22 @@ public class EntityStateLoader extends StateLoader
 
     public EntityState loadEntityState( HuffmanReader huffmanReader, int entityNumber )
     {
+        // Entity was removed
         if( huffmanReader.readBit() == 1 )
         {
-            return null;
+            RemovedEntityState removedEntityState = new RemovedEntityState();
+            removedEntityState.setNumber( entityNumber );
+
+            return removedEntityState;
         }
 
-        EntityState entityState = new EntityState();
+        // Entity was unchanged
+        DeltaEntityState entityState = new DeltaEntityState();
+        entityState.setNumber( entityNumber );
         if( huffmanReader.readBit() == 0 )
         {
             return entityState;
         }
-
-        entityState.setNumber( entityNumber );
 
         int count = huffmanReader.readByte();
         for( int entityFieldReaderIndex = 0; entityFieldReaderIndex < count; entityFieldReaderIndex++ )
@@ -94,6 +99,70 @@ public class EntityStateLoader extends StateLoader
     private boolean fieldChanged( HuffmanReader huffmanReader )
     {
         return huffmanReader.readBit() == 1;
+    }
+
+    private int readBits( HuffmanReader huffmanReader, int bitCount )
+    {
+        int result;
+
+        if( huffmanReader.readBit() == 0 )
+        {
+            result = 0;
+        }
+        else
+        {
+            result = huffmanReader.readBits( bitCount );
+        }
+
+        return result;
+    }
+
+    private float readFloat( HuffmanReader huffmanReader )
+    {
+        float result;
+
+        if( huffmanReader.readBit() == 0 )
+        {
+            result = 0;
+        }
+        else
+        {
+            result = huffmanReader.readFloat();
+        }
+
+        return result;
+    }
+
+    private int readByte( HuffmanReader huffmanReader )
+    {
+        byte result;
+
+        if( huffmanReader.readBit() == 0 )
+        {
+            result = 0;
+        }
+        else
+        {
+            result = huffmanReader.readByte();
+        }
+
+        return result;
+    }
+
+    private int readInt( HuffmanReader huffmanReader )
+    {
+        int result;
+
+        if( huffmanReader.readBit() == 0 )
+        {
+            result = 0;
+        }
+        else
+        {
+            result = huffmanReader.readInt();
+        }
+
+        return result;
     }
 
 }

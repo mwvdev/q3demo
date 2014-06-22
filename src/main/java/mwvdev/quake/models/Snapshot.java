@@ -63,9 +63,4 @@ public class Snapshot
         return entityStates;
     }
 
-    public void setEntityStates( List<EntityState> entityStates )
-    {
-        this.entityStates = entityStates;
-    }
-
 }

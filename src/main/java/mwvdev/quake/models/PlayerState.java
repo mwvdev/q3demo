@@ -520,4 +520,5 @@ public class PlayerState
     {
         this.entityEventSequence = entityEventSequence;
     }
+
 }

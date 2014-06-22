@@ -3,6 +3,7 @@ package mwvdev.quake.loaders;
 import mwvdev.quake.constants.GameStateConstants;
 import mwvdev.quake.constants.ServerToClientCommand;
 import mwvdev.quake.huffman.HuffmanReader;
+import mwvdev.quake.models.DeltaEntityState;
 import mwvdev.quake.models.EntityState;
 import mwvdev.quake.models.GameState;
 

@@ -93,14 +93,9 @@ public class MessageLoader
 
         message.setAcknowledge( huffmanReader.readInt() );
 
-        while( true )
+        byte command = huffmanReader.readByte();
+        while( command != ServerToClientCommand.SVC_EOM )
         {
-            byte command = huffmanReader.readByte();
-            if( command == ServerToClientCommand.SVC_EOM )
-            {
-                break;
-            }
-
             logger.info( "\tParsing message command: {}", command );
 
             switch( command )
@@ -142,6 +137,8 @@ public class MessageLoader
                     throw new LoaderException( "Invalid demo message command encountered." );
                 }
             }
+
+            command = huffmanReader.readByte();
         }
 
         logger.info( "Message acknowledge: {}", message.getAcknowledge() );
