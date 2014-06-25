@@ -1,5 +1,3 @@
-
-
 import mwvdev.quake.buffer.BitBuffer
 import mwvdev.quake.huffman.HuffmanDecoder
 import mwvdev.quake.huffman.HuffmanReader

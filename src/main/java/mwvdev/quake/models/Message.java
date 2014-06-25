@@ -1,7 +1,5 @@
 package mwvdev.quake.models;
 
-import mwvdev.quake.exceptions.LoaderException;
-
 import java.util.ArrayList;
 import java.util.List;
 

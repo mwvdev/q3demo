@@ -1,5 +1,3 @@
-
-
 import spock.lang.Specification
 
 class SimpleSpockTest extends Specification {

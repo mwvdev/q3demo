@@ -1,7 +1,6 @@
 package mwvdev.quake.loaders;
 
 import mwvdev.quake.huffman.HuffmanReader;
-import mwvdev.quake.models.DeltaEntityState;
 import mwvdev.quake.models.EntityState;
 import mwvdev.quake.models.Snapshot;
 

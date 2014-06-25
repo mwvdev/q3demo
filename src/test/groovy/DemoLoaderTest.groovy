@@ -1,5 +1,3 @@
-
-
 import mwvdev.quake.constants.PlayerMoveType
 import mwvdev.quake.constants.WeaponType
 import mwvdev.quake.exceptions.LoaderException
