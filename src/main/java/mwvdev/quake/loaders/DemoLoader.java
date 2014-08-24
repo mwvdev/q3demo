@@ -38,7 +38,7 @@ public class DemoLoader
     {
         Demo demo = new Demo();
 
-        MessageLoader messageLoader = new MessageLoader( channel );
+        MessageLoader messageLoader = new MessageLoader();
         Message message = messageLoader.loadMessage( channel );
         while( message != null )
         {

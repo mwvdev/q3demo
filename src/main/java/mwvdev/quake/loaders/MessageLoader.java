@@ -24,70 +24,16 @@ public class MessageLoader
 
     private static final int maxMessageLength = 0x4000;
 
-    private final ReadableByteChannel channel;
-
-    public MessageLoader( ReadableByteChannel channel )
-    {
-        this.channel = channel;
-    }
-
     public Message loadMessage( ReadableByteChannel channel )
     {
-        Message message = new Message();
-
-        ByteBuffer encodedBuffer = ByteBuffer.allocate( 8 );
-        encodedBuffer.order( ByteOrder.LITTLE_ENDIAN );
-
-        try
-        {
-            channel.read( encodedBuffer );
-        }
-        catch( IOException e )
-        {
-            throw new LoaderException( e );
-        }
-
-        encodedBuffer.flip();
-
-        message.setSequence( encodedBuffer.getInt() );
-        if( message.getSequence() == -1  )
+        Message message = prepareMessage( channel );
+        if( isDemoEOF( message ) )
         {
             return null;
         }
+        logger.info( "Loading message: {} Length: {}", message.getSequence(), message.getLength() );
 
-        message.setLength( encodedBuffer.getInt() );
-        if( message.getLength() == -1  )
-        {
-            return null;
-        }
-
-        if( message.getLength() == 0 && message.getLength() >= maxMessageLength )
-        {
-            throw new LoaderException( "Invalid demo message length encountered" );
-        }
-
-        encodedBuffer = ByteBuffer.allocateDirect( message.getLength() );
-        encodedBuffer.order( ByteOrder.LITTLE_ENDIAN );
-
-        int bytesRead;
-        try
-        {
-            bytesRead = channel.read( encodedBuffer );
-        }
-        catch( IOException e )
-        {
-            throw new LoaderException( e );
-        }
-
-        if( bytesRead != message.getLength() )
-        {
-            throw new LoaderException( "Invalid demo file encountered, possibly truncated." );
-        }
-
-        logger.info( "Loaded message: {} Length: {}", message.getSequence(), message.getLength() );
-
-        encodedBuffer.flip();
-
+        ByteBuffer encodedBuffer = prepareContentBuffer( channel, message );
         HuffmanDecoder huffmanDecoder = new HuffmanDecoder( new BitBuffer( encodedBuffer ) );
         HuffmanReader huffmanReader = new HuffmanReader( huffmanDecoder );
 
@@ -144,6 +90,61 @@ public class MessageLoader
         logger.info( "Message acknowledge: {}", message.getAcknowledge() );
 
         return message;
+    }
+
+    private Message prepareMessage( ReadableByteChannel channel )
+    {
+        Message message = new Message();
+
+        ByteBuffer encodedBuffer = ByteBuffer.allocate( 8 );
+        encodedBuffer.order( ByteOrder.LITTLE_ENDIAN );
+        try
+        {
+            channel.read( encodedBuffer );
+        }
+        catch( IOException e )
+        {
+            throw new LoaderException( e );
+        }
+        encodedBuffer.flip();
+
+        message.setSequence( encodedBuffer.getInt() );
+        message.setLength( encodedBuffer.getInt() );
+        if( message.getLength() == 0 && message.getLength() >= maxMessageLength )
+        {
+            throw new LoaderException( "Invalid demo message length encountered" );
+        }
+
+        return message;
+    }
+
+    private ByteBuffer prepareContentBuffer( ReadableByteChannel channel, Message message )
+    {
+        ByteBuffer encodedBuffer = ByteBuffer.allocateDirect( message.getLength() );
+        encodedBuffer.order( ByteOrder.LITTLE_ENDIAN );
+
+        int bytesRead;
+        try
+        {
+            bytesRead = channel.read( encodedBuffer );
+        }
+        catch( IOException e )
+        {
+            throw new LoaderException( e );
+        }
+
+        if( bytesRead != message.getLength() )
+        {
+            throw new LoaderException( "Invalid demo file encountered, possibly truncated." );
+        }
+
+        encodedBuffer.flip();
+        return encodedBuffer;
+    }
+
+    private boolean isDemoEOF( Message message )
+    {
+        return message.getSequence() == -1 && message.getLength() == -1;
     }
 
 }
