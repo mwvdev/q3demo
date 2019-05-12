@@ -19,7 +19,7 @@ public class DemoLoader
 
     public Demo loadDemo( String demoFilename )
     {
-        logger.info( "Loading demo: ", demoFilename );
+        logger.info( "Loading demo: {}", demoFilename );
 
         InputStream inputStream;
         try
